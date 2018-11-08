@@ -15,12 +15,12 @@ There are two different aspects of memory system behavior, both of which are cri
 2. A read by a processor to location X that follows a write by another processor to X returns the written value if the read and write are sufficiently separated in time and no other writes to X occur between the two accesses.
 3. Writes to the same location are serialized; that is, two writes to the same location by any two processors are seen in the same order by all processors. For example, if the values 1 and then 2 are written to a location, processors can never read the value of the location as 2 and then later read it as 1.
 
-##Snooping
+## Snooping
 
-###1. Write-Once
+### 1. Write-Once
 
-####States { INVALID, VALID, RESERVED, DIRTY }
-####Protocol
+#### States { INVALID, VALID, RESERVED, DIRTY }
+#### Protocol
 
 * **Read miss** - If another copy of the block exists that is in state DIRTY, the cache with that copy inhibits the memory from supplying the data and supplies the block itself, as well as writing the block back to main memory. If no cache has a DIRTY copy, the block comes from memory. All caches with a copy of the block set their state to VALID. 
 
@@ -28,10 +28,10 @@ There are two different aspects of memory system behavior, both of which are cri
 * **Write miss** - Like a read miss, the block is loaded from memory, or, if the block is DIRTY, from the cache that has the DIRTY copy, which then invalidates its copy. Upon seeing the write miss on the bus, all other caches with the block invalidate their copies. Once the block is loaded, the write takes place and the state is set to DIRTY. 
 
 
-###2.  Synapse
+### 2. Synapse
 
-####States { INVALID, VALID, DIRTY }
-####Protocol
+#### States { INVALID, VALID, DIRTY }
+#### Protocol
 
 * **Read miss** -  If another cache has a DIRTY copy, the cache submitting the read miss receives a negative acknowledgement. The owner then writes the block back to main memory, simultaneously resetting the bit tag and changing the local state to INVALID. The requesting cache must then send ,an additional miss request to get the block from main memory. In all other cases the block comes directly from main memory. Note that the block is always supplied by its owner, whether memory or a cache. The loaded block is always in state VALID. 
 * **Write hit** - If the block is DIRTY, the write can proceed without delay. If the block is VALID, the procedure is identical to a write miss (including a full data transfer) since there is no invalidation signal. 
@@ -39,8 +39,8 @@ There are two different aspects of memory system behavior, both of which are cri
 
 ###3. Berkeley
 
-####States { INVALID, VALID, SHARED-DIRTY, DIRTY}
-####Protocol
+#### States { INVALID, VALID, SHARED-DIRTY, DIRTY}
+#### Protocol
 * **Read Miss** - The cache with state DIRTY or SHARED-DIRTY must provide the block contents to the requesting cache and its state is changed to SHARED-DIRTY. If there is no cache with states DIRTY or SHARED-DIRTY, then the block is fetched from the main memory. The state of the requesting cache is always set to VALID.
 * **Write Hit** - If the block is DIRTY, then the write proceeds with no delay. Otherwise, if it is VALID or SHARED-DIRTY, then an invalidation signal is send on the bus before the write proceeds. The state is always changed to DIRTY in the requesting cache.
 * **Write miss** - The block comes directly from the cache (if any) having the block in DIRTY or SHARED-DIRTY state or from the memory if there is no such cache. All other caches invalidates their copies and the requesting cache sets the state to DIRTY. 	
@@ -52,10 +52,10 @@ There are two different aspects of memory system behavior, both of which are cri
 It uses direct cache-tocache transfers in the case of shared blocks.
 DIRTY blocks are not written back to memory when they become SHARED requiring one additional state. 
 
-###4. Illinois
+### 4. Illinois
 
-####States { INVALID, VALID, SHARED-DIRTY, DIRTY}
-####Protocol
+#### States { INVALID, VALID, SHARED-DIRTY, DIRTY}
+#### Protocol
 * **Read Miss** - Any other cache having a copy of the block puts it on the bus. If the block is DIRTY, then it is also written to the main memory. If the block is shared, then the cache with the highest priority provides the block on the bus. All caches having the copy of the block will observe the bus and set their states to SHARED, and the requesting cache sets the state of the loaded block to SHARED. If the block comes from memory, no other caches have the block, and the block is loaded in state VALID-EXCLUSIVE.
 * **Write Hit** - If the block is DIRTY or VALID-EXCLUSIVE, it can be written immediately. If the block is SHARED, then the write is delayed until an invalidation signal can be sent on the bus, which causes all other caches with a copy to set their state to INVALID. The state of the block is always changed to DIRTY.
 * **Write miss** - Like a read miss, the block comes from a cache, if any cache has a copy of the block. All other caches invalidate their copies, and the block is loaded in state DIRTY.
@@ -63,20 +63,20 @@ DIRTY blocks are not written back to memory when they become SHARED requiring on
 #### Important Points
 It is assumed that the requesting cache will be able to determine the source of the block. Each time that a block is loaded it can therefore be determined whether or not it is shared. Blocks are written back at replacement only if they are in state DIRTY. 	
 
-###5. Firefly
+### 5. Firefly
 
-####States { VALID-EXCLUSIVE, SHARED, DIRTY }
-####Protocol
+#### States { VALID-EXCLUSIVE, SHARED, DIRTY }
+#### Protocol
 
 * **Read Miss** - If another cache has the block, SharedLine is raised. All the caches with the block respond by putting a copy on the bus. All caches set the state to SHARED. If the SharedLine was not raised, the block is supplied by the memory and the state set to VALID-EXCLUSIVE. If the owning cache has the block in DIRTY, it is written to memory
 * **Write Hit** - If the block is DIRTY or VALID-EXCLUSIVE the write can be performed immediately, with the final state DIRTY. If the block was in state SHARED, the write is delayed until the bus is acquired and write to main memory is initiated. Other caches observe the write on the bus and update their copy of the block.
 * **Write Miss** - If any other cache has the block, it supplies the copy. The requesting block determines from the SharedLine whether the block was provided by other cache or main memory. If the block came from memory, the state is set to DIRTY, If the block came from other cache the state is set to SHARED and requesting cache must write the block to memory. Other caches with the copy will observe this write and update the old block with new one.
 
 
-###6. Dragon
+### 6. Dragon
 
-####States { VALID-EXCLUSIVE, SHARED-DIRTY, SHARED-CLEAN, DIRTY }
-####Protocol
+#### States { VALID-EXCLUSIVE, SHARED-DIRTY, SHARED-CLEAN, DIRTY }
+#### Protocol
 * **Read Miss** - If other cache has a DIRTY or SHARED-DIRTY copy, it provides the cache block, raises the SharedLine and the block state is set to SHARED-DIRTY in all caches. If other cache has the block in state VALID-EXCLUSIVE or SHARED-CLEAN it will provide the block, raise the SharedLine and the block state will be set to SHARED-CLEAN in all caches. If the SharedLine was not raised, the block is received from memory with state VALID-EXCLUSIVE.
 * **Write Hit** - If the block is DIRTY or VALID-EXCLUSIVE the write can be performed immediately, with the final state DIRTY. If the block was in state SHARED-CLEAN or SHARED-DIRTY, the write is delayed until the bus is acquired and write to main memory is initiated. Other caches observe the write on the bus and update their copy of the block.
 * **Write Miss** - As with a read miss, the block comes from a cache if it is DIRTY or SHARED-DIRTY and from memory otherwise. Other caches with copies set their local state to SHARED-CLEAN. Upon loading the block, the requesting cache sets the local state to DIRTY if the SharedLine is not raised. If the SharedLine is high, the requesting cache sets the state to SHARED-DIRTY and performs a bus write to broadcast the new content.
@@ -108,5 +108,5 @@ Scalability is one of the strongest motivations for going to directory based des
 
 Hence we can say that Snoopy schemes are used on small scale multiprocessors which can live with the bandwidth constraints of the shared bus while Directory based schemes are better suited for building large scale, cache coherent multiprocessors where single bus is unsuitable as a communication mechanism.
 
-##Hybrid Protocols
-##Conclusion
+## Hybrid Protocols
+## Conclusion
