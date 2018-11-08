@@ -37,7 +37,7 @@ There are two different aspects of memory system behavior, both of which are cri
 * **Write hit** - If the block is DIRTY, the write can proceed without delay. If the block is VALID, the procedure is identical to a write miss (including a full data transfer) since there is no invalidation signal. 
 * **Write miss** - Like a read miss, the block always comes from memory-if the block was DIRTY in another cache, it must first be written to memory by the owner. Any caches with a VALID block copy set their state to INVALID, and the block is loaded in state DIRTY. The block’s tag in main memory is set so that the memory ignores subsequent requests for the block.
 
-###3. Berkeley
+### 3. Berkeley
 
 #### States { INVALID, VALID, SHARED-DIRTY, DIRTY}
 #### Protocol
