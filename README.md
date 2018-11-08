@@ -54,7 +54,7 @@ DIRTY blocks are not written back to memory when they become SHARED requiring on
 
 ### 4. Illinois
 
-#### States { INVALID, VALID, SHARED-DIRTY, DIRTY}
+#### States { INVALID, VALID-EXCLUSIVE, SHARED, DIRTY}
 #### Protocol
 * **Read Miss** - Any other cache having a copy of the block puts it on the bus. If the block is DIRTY, then it is also written to the main memory. If the block is shared, then the cache with the highest priority provides the block on the bus. All caches having the copy of the block will observe the bus and set their states to SHARED, and the requesting cache sets the state of the loaded block to SHARED. If the block comes from memory, no other caches have the block, and the block is loaded in state VALID-EXCLUSIVE.
 * **Write Hit** - If the block is DIRTY or VALID-EXCLUSIVE, it can be written immediately. If the block is SHARED, then the write is delayed until an invalidation signal can be sent on the bus, which causes all other caches with a copy to set their state to INVALID. The state of the block is always changed to DIRTY.
