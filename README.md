@@ -108,5 +108,15 @@ Scalability is one of the strongest motivations for going to directory based des
 
 Hence we can say that Snoopy schemes are used on small scale multiprocessors which can live with the bandwidth constraints of the shared bus while Directory based schemes are better suited for building large scale, cache coherent multiprocessors where single bus is unsuitable as a communication mechanism.
 
+### Analyzing performance of snooping protocols
+For the comparison of the above mentioned protocols, we read another paper which used a simulation based approach for benchmarking the protocols. We briefly explain the method used and the important insights gained.
+
+**Simulation Model** - The basic model consists of a Simula process for each processor, a process for each cache, and a single process for the system bus. Each processor, after performing useful work for some w cycles (picked from some distribution),
+generates a memory request, puts that request into the service queue of its cache, and waits for a response, during which time no work is done. Processor utilization is measured by the ratio of time spent doing useful work to the total run time. System performance is measured by the total sum of processor utilization in the system.
+
+Each cache services memory requests from its processor by determining whether the requested block is present or absent, or, more precisely, whether the request can be serviced without a bus transaction. If so, after one cycle the cache sends the processor a command to continue. If a bus transaction is required, a bus request is generated and inserted into the service queue of the bus. The cache sends the processor a command to continue only upon completion of the bus transaction.
+
+The cache can also receive commands from the bus process relating to actions that must be performed on blocks of which it has copies. Such commands have higher priority for service by the cache than processor memory requests. In a multiprocessor, this is equivalent to matching a block address on a bus transaction and halting the service of processor requests to take action as specified by tbe protocol. After that action is completed, the cache is free to respond to processor requests. 
+
 ## Hybrid Protocols
 ## Conclusion
