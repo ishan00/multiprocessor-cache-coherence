@@ -161,9 +161,13 @@ The cache can also receive commands from the bus process relating to actions tha
 
 **System & Simulation Parameters** - Number of cycles to fetch an item from main memory was taken to be four times of cycles to fetch from cache. The block size is four words, where a single word is the smallest unit of data transferred. The number of processors are varied from 1 to 15. The cache size is varied from 2K to 16K words. Invalidation signals require one cycle of bus time. The probability of memory reference to shared block ranges from 0.1% to 5%. The hit ratio on private block is varied from 95% to 98%. There are other statistics like the probability of a private block being modified incase of reference, the percent of memory requests which are read, probability of shared block being referenced at two or more caches in small interval etc which are mentioned in the paper but we would not go in the exact details.
 
-**Performance - Private blocks** - When the vast majority of all references are to the private blocks, the differences between the performance of these protocols is entirely due to private block overhead. For the cache-coherence protocols that we modeled there are only two differences in the handling of private blocks: the actions that must be taken on a write hit on a unmodified block, and the actions that must be taken when a block is replaced in the cache.
+**Performance - Private blocks**
 
-![Private Blocks Performance](Figure_7.png)
+<p align=center>
+<img src=Figure_7.png width=60% height=500px>
+</p>
+
+When the vast majority of all references are to the private blocks, the differences between the performance of these protocols is entirely due to private block overhead. For the cache-coherence protocols that we modeled there are only two differences in the handling of private blocks: the actions that must be taken on a write hit on a unmodified block, and the actions that must be taken when a block is replaced in the cache.
 
 In case of write hits on unmodified private blocks - 
 * Theoretically, any overhead is logically unnecessary since private blocks are never in other caches, but only the Dragon, Firefly, and Illinois schemes are able to detect this information dynamically. In these schemes the state can be changed from VALID-EXCLUSIVE to DIRTY without any bus transaction since it is known that the unmodified block is not present elsewhere. 
@@ -177,6 +181,11 @@ reduced. In this scheme those blocks written exactly once are up-to-date in
 memory and therefore do not require a write-back. 
 
 **Performance - Shared blocks** 
+
+<p align=center>
+<img src=Figure_14.png width=60% height=500px>
+</p>
+
 * The results demonstrate that the distributed write approach of Dragon and Firefly yields the best performance in the handling of shared data. For those simulations with a small number of shared blocks (and hence more contention for those blocks) these two protocols significantly outperform the others. This is because the overhead of distributing the newly written data is much lower than repeatedly invalidating all other copies. 
 * The performance of the Dragon exceeds that of the Firefly at levels of high sharing because the Firefly must send distributed writes to memory while the Dragon sends them to the caches only. However, this gain in performance comes at the cost of one added state (SHARED-DIRTY) for the Dragon. 
 * The Berkeley scheme, although somewhat less efficient in handling private blocks, actually surpasses the Illinois scheme at levels of high sharing as a result of its improved efficiency in the handling of shared blocks. On a miss on a block modified in another cache, Berkeley does not require updating main memory as does Illinois. 
