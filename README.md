@@ -134,11 +134,11 @@ Just as with a snooping protocol, there are two primary operations that a direct
 
 
 | Initial State | Request | Response/ Action(by Directory Controller) | New State |
-|:-----:|:-----:|:--------:|:------:|
+|:-----:|:-----:|:--------|:------:|
 |U    | Read Miss or Write Miss | <ul><li>Fetch block from the memory directly</li><li>Send the memory block to requesting cache</li></ul>| M |
-| M | Read Miss | Send request to the cache holding the modified block to provide the data to requesting cache | S |
-| | Write Miss | Send request to the cache containing the modified block to invalidate it | - |
-| S | Read Miss | Reply to the requesting cache with the memory block | - |
+| M | Read Miss | <ul><li>Send request to the cache holding the modified block to provide the data to requesting cache</li></ul> | S |
+| | Write Miss | <ul><li>Send request to the cache containing the modified block to invalidate it</li></ul> | - |
+| S | Read Miss | <ul><li>Reply to the requesting cache with the memory block</li></ul> | - |
 | | Write Miss | <ul><li>Reply to the requesting cache with the memory block</li><li>Send request to all the caches which are sharing the block to invalidate it</li></ul>| M |
 | | Write Hit | <ul><li>Send request to all the caches which are sharing the block to invalidate it</li><li>Reply to the requesting cache that the block can now be modified by it</li></ul> | M |
 
@@ -174,41 +174,23 @@ The paper intends to isolate and measure only the traffic incurred in maintainin
 
 | Event Type | Dir<sub>1</sub>NB | WTI | Dir<sub>0</sub>B | Dragon |
 |:-----|:-----:|:--------:|:------:|:------:|
-| instr | 49.72 | 49.72 | 49.72 | 49.72 |
-| read | 39.82 | 39.82 | 39.82 | 39.82 |
-| &nbsp; rd-hit | 34.32 | 38.88 | 38.88 | 39.20 |
-| &nbsp; rd-miss(rm) | 5.18 | 0.62 | 0.62 | 0.30 |
-| &nbsp; &nbsp; rm-blk-cln | 4.78 | - | 0.23 | 0.14 |
-| &nbsp; &nbsp; rm-blk-drty | 0.40 | - | 0.40 | 0.17 |
-| &nbsp; rm-first-ref| 0.32 | 0.32 | 0.32 | 0.32 |
-| write | 10.46 | 10.46 | 10.46 | 10.46 |
-| &nbsp; wrt-hit(wh) | 10.19 | 10.25 | 10.25 | 10.36 |
-| &nbsp; &nbsp; wh-blk-cln | - | - | 0.41 | - |
-| &nbsp; &nbsp; wh-blk-drty | - | - | 9.48 | - |
-| &nbsp; &nbsp; wh-distrib | - | - | - | 1.74 |
-| &nbsp; &nbsp; wh-local | - | - | - | 8.62 |
-| &nbsp; wrt-miss(wm) | 0.17 | 0.12 | 0.11 | 0.02 |
-| &nbsp; &nbsp; wm-blk-cln | 0.08 | - | 0.02 | 0.01 |
-| &nbsp; &nbsp; wm-blk-drty | 0.09 | - | 0.09 | 0.01 |
-| &nbsp; wm-first-ref | 0.08 | 0.08 | 0.08 | 0.08 |
-
-Instr					Instructions
-Read					Reads
-	Rd-hit				Read hits
-	rd-miss(rm)			Read misses
-		Rm-blk-cln		Read miss, block clean in another cache
-		Rm-blk-drty		Read miss, block dirty in another cache
-	Rm-first-ref			Read miss, first reference to the block
-Write					Writes
-	wrt-hit(wh)			Write hits
-		Wh-blk-cln		Write hit, block clean in the same cache
-		Wh-blk-drty		Write hit, block dirty in the same cache
-		Wh-distrib		Write hit, block also in another cache
-Wh-local		Write hit, block not in another cache
-wrt-miss(wm)			Write miss
-Wm-blk-cln		Write miss, block clean in another cache
-Wm-blk-drty		Write miss, block dirty in another cache
-Wm-first-ref			Write miss, first reference to the block	
+| Instructions | 49.72 | 49.72 | 49.72 | 49.72 |
+| Reads | 39.82 | 39.82 | 39.82 | 39.82 |
+| &nbsp; Read hits | 34.32 | 38.88 | 38.88 | 39.20 |
+| &nbsp; Read misses | 5.18 | 0.62 | 0.62 | 0.30 |
+| &nbsp; &nbsp; Read miss, block clean in another cache | 4.78 | - | 0.23 | 0.14 |
+| &nbsp; &nbsp; Read miss, block dirty in another cache | 0.40 | - | 0.40 | 0.17 |
+| &nbsp; Read miss, first reference to the block | 0.32 | 0.32 | 0.32 | 0.32 |
+| Writes | 10.46 | 10.46 | 10.46 | 10.46 |
+| &nbsp; Write hits | 10.19 | 10.25 | 10.25 | 10.36 |
+| &nbsp; &nbsp; Write hit, block clean in the same cache | - | - | 0.41 | - |
+| &nbsp; &nbsp; Write hit, block dirty in the same cache | - | - | 9.48 | - |
+| &nbsp; &nbsp; Write hit, block also in another cache | - | - | - | 1.74 |
+| &nbsp; &nbsp; Write hit, block not in another cache | - | - | - | 8.62 |
+| &nbsp; Write misses | 0.17 | 0.12 | 0.11 | 0.02 |
+| &nbsp; &nbsp; Write miss, block not in another cache | 0.08 | - | 0.02 | 0.01 |
+| &nbsp; &nbsp; Write miss, block dirty in another cache | 0.09 | - | 0.09 | 0.01 |
+| &nbsp; Write miss, first reference to the block | 0.08 | 0.08 | 0.08 | 0.08 |
 
 These event counts can be used to make several useful observations about the cache behaviour as well as data sharing behaviour of the the trace.
 
