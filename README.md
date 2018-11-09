@@ -121,12 +121,17 @@ The cache can also receive commands from the bus process relating to actions tha
 **System & Simulation Parameters** - Number of cycles to fetch an item from main memory was taken to be four times of cycles to fetch from cache. The block size is four words, where a single word is the smallest unit of data transferred. The number of processors are varied from 1 to 15. The cache size is varied from 2K to 16K words. Invalidation signals require one cycle of bus time. The probability of memory reference to shared block ranges from 0.1% to 5%. The hit ratio on private block is varied from 95% to 98%. There are other statistics like the probability of a private block being modified incase of reference, the percent of memory requests which are read, probability of shared block being referenced at two or more caches in small interval etc which are mentioned in the paper but we would not go in the exact details.
 
 **Performance - Private blocks** - When the vast majority of all references are to the private blocks, the differences between the performance of these protocols is entirely due to private block overhead. For the cache-coherence protocols that we modeled there are only two differences in the handling of private blocks: the actions that must be taken on a write hit on a unmodified block, and the actions that must be taken when a block is replaced in the cache.
+
 In case of write hits on unmodified private blocks - 
 * Theoretically, any overhead is logically unnecessary since private blocks are never in other caches, but only the Dragon, Firefly, and Illinois schemes are able to detect this information dynamically. In these schemes the state can be changed from VALID-EXCLUSIVE to DIRTY without any bus transaction since it is known that the unmodified block is not present elsewhere. 
-* The Berkeley scheme requires a single bus cycle for an invalidation signal. Writeonce
-(like write-through) requires a single word write to main memory.
+* The Berkeley scheme requires a single bus cycle for an invalidation signal. 
+* Writeonce (like write-through) requires a single word write to main memory.
 * The Synapse scheme performs a complete block load, as if a write miss had occurred.
 
+The difference that arises in the replacement of blocks in the cache is that, for
+the write-once scheme, the probability that a block needs to be written back is
+reduced. In this scheme those blocks written exactly once are up-to-date in
+memory and therefore do not require a write-back. 
 
 **Performance - Shared blocks**
 // TODO Graph
