@@ -215,7 +215,7 @@ So after going through all the above protocols, the main question that still per
 * The performance analysis of directory models use trace driven simulation. This has the drawback that the same trace is used to evaluate all consistency protocols while in reality the reference patterns will be different in each schemes due to the timing differences. But the traces represent at least one possible run of the program and hence can accurately distinguish the performance of various schemes of that run.
 
 
-### Future Works
+### Future Work
 
 Adaptive Protocols - Instead of having the protocol defined in hardware and fixed for a given architecture, if we could have adaptive protocols that depeding on the past history of references switch to other protocol schemes which would be more efficient in terms of utility of memory bus and memory access time.
 
