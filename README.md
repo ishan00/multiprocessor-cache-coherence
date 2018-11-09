@@ -225,8 +225,7 @@ In such protocols, usually system-wide status information relevant to coherence 
 
 ## Conclusion
 ## References
-[1] John L. Hennessy, and  David A. Patterson.  Computer Architecture A Quantitative Approach Fourth Edition.
 
-[2] Eggers. S. J., and Katz, R. H. (1989). Evaluating the Performance of Four Snooping cache Coherence Protocols. In: Proc. 16th Annual Int'l Symposium on Computer Architecture.
-
-[3] Owicki, S., and Agarwal, A. (1989). Evaluating the Performance of Software Cache Coherence. In: Proc. 3rd Inr '1 Conference on Architectural Support for Programming Languages and Operating Systems.
+[1] John L. Hennessy, and  David A. Patterson.  Computer Architecture A Quantitative Approach Fourth Edition.  
+[2] Eggers. S. J., and Katz, R. H. (1989). Evaluating the Performance of Four Snooping cache Coherence Protocols. In: Proc. 16th Annual Int'l Symposium on Computer Architecture.  
+[3] Owicki, S., and Agarwal, A. (1989). Evaluating the Performance of Software Cache Coherence. In: Proc. 3rd Inr '1 Conference on Architectural Support for Programming Languages and Operating Systems.  
