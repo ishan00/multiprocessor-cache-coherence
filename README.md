@@ -139,8 +139,8 @@ Just as with a snooping protocol, there are two primary operations that a direct
 | M | Read Miss | <ul><li>Send request to the cache holding the modified block to provide the data to requesting cache</li></ul> | S |
 | | Write Miss | <ul><li>Send request to the cache containing modified block to invalidate it</li></ul> | - |
 | S | Read Miss | <ul><li>Reply to the requesting cache with the memory block</li></ul> | - |
-| | Write Miss | <ul><li>Reply to the requesting cache with the memory block</li><li>Send request to all the caches which are sharing the block to invalidate it</li></ul>| M |
-| | Write Hit | <ul><li>Send request to all the caches which are sharing the block to invalidate it</li><li>Reply to the requesting cache that the block can now be modified</li></ul> | M |
+| | Write Miss | <ul><li>Reply to the requesting cache with the memory block</li><li>Send request to all caches which are sharing the block to invalidate it</li></ul>| M |
+| | Write Hit | <ul><li>Send request to all caches which are sharing the block to invalidate it</li><li>Reply to the requesting cache that the block can now be modified</li></ul> | M |
 
 In addition to cache state, a directory must track which processors have data when in the shared state. This is required to for sending invalidation and intervention requests to the individual processor caches which have the cache block in shared state. Few of the popular implementation approaches are :
 
@@ -206,6 +206,19 @@ We saw solutions to cache coherence problem through software and hardware protoc
 In such protocols, usually system-wide status information relevant to coherence maintenance is stored in directory in shared memory. Processors are logically grouped into Sharer Groups depending on the request types. Snoopy methods (pure-write update and pure-write invalidate) are used within each Sharer Group whereas Directory based methods are used for communication between different Groups.
 
 ## Conclusion
+
+So after going through all the above protocols, the main question that still persists is which protocol to use? The answer to this question depends on our application and constraints. If the task on hand is large scale multiprocessor systems then directory based approaches are better suited that snooping particularly due to the non-reliance on broadcasts. Whereas for small scale systems involving few multiprocessors, snooping based protocols are much faster and have low implementation overhead.
+
+### Critique
+
+* The performance analysis of snooping model used Simula model for processors. This is a very simple model and far from the complexity of real multiprocessor systems. The simula model issued one memory reference per w cycles and waited until the memory request is served. The actual workload for multiprocessor systems would be unsymmetric.
+* The performance analysis of directory models use trace driven simulation. This has the drawback that the same trace is used to evaluate all consistency protocols while in reality the reference patterns will be different in each schemes due to the timing differences. But the traces represent at least one possible run of the program and hence can accurately distinguish the performance of various schemes of that run.
+
+
+### Future Works
+
+Adaptive Protocols - Instead of having the protocol defined in hardware and fixed for a given architecture, if we could have adaptive protocols that depeding on the past history of references switch to other protocol schemes which would be more efficient in terms of utility of memory bus and memory access time.
+
 ## Contributions
 | Roll Number | Contribution |
 |:-----|:-----|
