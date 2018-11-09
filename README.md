@@ -137,10 +137,10 @@ Just as with a snooping protocol, there are two primary operations that a direct
 |:-----:|:-----:|:--------|:------:|
 |U    | Read Miss or Write Miss | <ul><li>Fetch block from the memory directly</li><li>Send the memory block to requesting cache</li></ul>| M |
 | M | Read Miss | <ul><li>Send request to the cache holding the modified block to provide the data to requesting cache</li></ul> | S |
-| | Write Miss | <ul><li>Send request to the cache containing the modified block to invalidate it</li></ul> | - |
+| | Write Miss | <ul><li>Send request to the cache containing modified block to invalidate it</li></ul> | - |
 | S | Read Miss | <ul><li>Reply to the requesting cache with the memory block</li></ul> | - |
 | | Write Miss | <ul><li>Reply to the requesting cache with the memory block</li><li>Send request to all the caches which are sharing the block to invalidate it</li></ul>| M |
-| | Write Hit | <ul><li>Send request to all the caches which are sharing the block to invalidate it</li><li>Reply to the requesting cache that the block can now be modified by it</li></ul> | M |
+| | Write Hit | <ul><li>Send request to all the caches which are sharing the block to invalidate it</li><li>Reply to the requesting cache that the block can now be modified</li></ul> | M |
 
 In addition to cache state, a directory must track which processors have data when in the shared state. This is required to for sending invalidation and intervention requests to the individual processor caches which have the cache block in shared state. Few of the popular implementation approaches are :
 
@@ -159,7 +159,7 @@ This scheme also proposed a similar consistency mechanism that performs the same
 ### 3. Yen and Fu[6]
 This scheme suggested a small refinement to Censier and Feautrier consistency technique. The central directory is unchanged, but in addition to the valid and dirty bits, a flag called the single bit is associated with each block in the caches. A cache block's single bit is se if and only if that cache is the only one in the system that contains the block. This saves having to complete a directory access before writing to a clean block that is not cached elsewhere. The major drawback of this scheme is that extra bus bandwidth is consumed to keep the single bits updated in all the caches. Thus, the scheme saves central directory accesses, but does not reduce the number of bus accesses versus the Censier and Feautrier protocol.
 ### 4. Archibald and Baer[7]
-This scheme presented a directory-based consistency mechanism with a different organization for the central directory that reduces the amount of storage space in the directory, and also makes it easier to add more caches to the system. The directory saves only two bits with each block in main memory. These bits encode on of four possible stated: block not cached, block clean in exactly on cache, block clean in an unknown number of caches, and block  dirty in exactly on cache. The directory therefore contains no information to indicate which caches contain a block: the scheme relies on broadcasts to perform in invalidates and writeback requests. The block clean in exactly on cache state obviates the need for a broadcast when writing to a clean block that is not contained in any other caches.  <br>
+This scheme presented a directory-based consistency mechanism with a different organization for the central directory that reduces the amount of storage space in the directory, and also makes it easier to add more caches to the system. The directory saves only two bits with each block in main memory. These bits encode on of four possible stated: block not cached, block clean in exactly on cache, block clean in an unknown number of caches, and block  dirty in exactly on cache. The directory therefore contains no information to indicate which caches contain a block: the scheme relies on broadcasts to perform in invalidates and writeback requests. The block clean in exactly on cache state obviates the need for a broadcast when writing to a clean block that is not contained in any other caches.  <br><br>
 
 Two clear differences are present among these directory schemes : the number of processor indices contained in the directories and the presence of a broadcast bit. We can thus classify the schemes as Dir<sub>i</sub>X, where i is the number of indices kept in the directory and X is either B or NB for Broadcast or No Broadcast. In a no-broadcast scheme the number of processors that have copies of a datum must always be less than or equal to i, the number of indices kept in the directory. If the scheme allows broadcast then the numbers of processors can be larger and when it is (indicated by a bit in the directory) a broadcast is used to invalidate the cached data. The one case that does not make sense is Dir<sub>0</sub>NB, since there is no way to obtain exclusive access.
 
@@ -206,6 +206,15 @@ We saw solutions to cache coherence problem through software and hardware protoc
 In such protocols, usually system-wide status information relevant to coherence maintenance is stored in directory in shared memory. Processors are logically grouped into Sharer Groups depending on the request types. Snoopy methods (pure-write update and pure-write invalidate) are used within each Sharer Group whereas Directory based methods are used for communication between different Groups.
 
 ## Conclusion
+## Contributions
+| Roll Number | Contribution |
+|:-----|:-----|
+| 160050003 | Directory-based and Hybrid Protocols |
+| 160050010 | Directory-based and Hybrid Protocols |
+| 160050021 | Write-Once and Synapse protocols |
+| 160050052 | Berkeley and Illinois protocols, Performance - private and shared blocks |
+| 160050054 | Firefly and Dragon protocols, Simulation Model, Parameters |
+
 ## References
 
 [1] John L. Hennessy, and  David A. Patterson.  Computer Architecture A Quantitative Approach Fourth Edition.  
