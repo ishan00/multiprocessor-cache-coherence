@@ -133,11 +133,8 @@ the write-once scheme, the probability that a block needs to be written back is
 reduced. In this scheme those blocks written exactly once are up-to-date in
 memory and therefore do not require a write-back. 
 
-**Performance - Shared blocks**
-* The curves with increased references to shared blocks Dragon, Firefly, and Illinois can be very different, although the schemes are identical with private blocks. 
-* On a read miss in some schemes, the block always comes from another cache (if any cache has a copy) even if it is clean, whereas in the others the block is loaded from main memory (requiring slightly more time to service in the simulation).
-* The results demonstrate that the distributed write approach of Dragon and Firefly yields the best performance in the handling of shared data. For those simulations with a small number of shared blocks (and hence more contention for those blocks) these two protocols significantly outperform the others. This is
-because the overhead of distributing the newly written data is much lower than repeatedly invalidating all other copies. 
+**Performance - Shared blocks** 
+* The results demonstrate that the distributed write approach of Dragon and Firefly yields the best performance in the handling of shared data. For those simulations with a small number of shared blocks (and hence more contention for those blocks) these two protocols significantly outperform the others. This is because the overhead of distributing the newly written data is much lower than repeatedly invalidating all other copies. 
 * The performance of the Dragon exceeds that of the Firefly at levels of high sharing because the Firefly must send distributed writes to memory while the Dragon sends them to the caches only. However, this gain in performance comes at the cost of one added state (SHARED-DIRTY) for the Dragon. 
 * The Berkeley scheme, although somewhat less efficient in handling private blocks, actually surpasses the Illinois scheme at levels of high sharing as a result of its improved efficiency in the handling of shared blocks. On a miss on a block modified in another cache, Berkeley does not require updating main memory as does Illinois. 
 * The performance of write-once is lower than the above schemes (for high levels of contention) as a result of the added overhead of updating memory each time a DIRTY block is missed in another cache. 
