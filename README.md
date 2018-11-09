@@ -122,6 +122,8 @@ The cache can also receive commands from the bus process relating to actions tha
 
 **Performance - Private blocks** - When the vast majority of all references are to the private blocks, the differences between the performance of these protocols is entirely due to private block overhead. For the cache-coherence protocols that we modeled there are only two differences in the handling of private blocks: the actions that must be taken on a write hit on a unmodified block, and the actions that must be taken when a block is replaced in the cache.
 
+![Private Blocks Performance](Figure_7.png)
+
 In case of write hits on unmodified private blocks - 
 * Theoretically, any overhead is logically unnecessary since private blocks are never in other caches, but only the Dragon, Firefly, and Illinois schemes are able to detect this information dynamically. In these schemes the state can be changed from VALID-EXCLUSIVE to DIRTY without any bus transaction since it is known that the unmodified block is not present elsewhere. 
 * The Berkeley scheme requires a single bus cycle for an invalidation signal. 
