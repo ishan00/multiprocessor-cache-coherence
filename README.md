@@ -219,6 +219,10 @@ These event counts can be used to make several useful observations about the cac
 
  
 ## Hybrid Protocols
+We saw solutions to cache coherence problem through software and hardware protocols : snoopy and directory. But while addressing cache coherency in shared memory multiprocessors, traditional snoopy based pure-write update and pure-write invalidate protocols or directory based protocols have many issues including low bandwidth, high memory latency and large cache miss ratio. Hence modern systems use hybrid cache coherence protocols.
+
+In such protocols, usually system-wide status information relevant to coherence maintenance is stored in directory in shared memory. Processors are logically grouped into Sharer Groups depending on the request types. Snoopy methods (pure-write update and pure-write invalidate) are used within each Sharer Group whereas Directory based methods are used for communication between different Groups.
+
 ## Conclusion
 ## References
 [1] John L. Hennessy, and  David A. Patterson.  Computer Architecture A Quantitative Approach Fourth Edition.
