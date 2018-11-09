@@ -81,6 +81,49 @@ It is assumed that the requesting cache will be able to determine the source of 
 * **Write Hit** - If the block is DIRTY or VALID-EXCLUSIVE the write can be performed immediately, with the final state DIRTY. If the block was in state SHARED-CLEAN or SHARED-DIRTY, the write is delayed until the bus is acquired and write to main memory is initiated. Other caches observe the write on the bus and update their copy of the block.
 * **Write Miss** - As with a read miss, the block comes from a cache if it is DIRTY or SHARED-DIRTY and from memory otherwise. Other caches with copies set their local state to SHARED-CLEAN. Upon loading the block, the requesting cache sets the local state to DIRTY if the SharedLine is not raised. If the SharedLine is high, the requesting cache sets the state to SHARED-DIRTY and performs a bus write to broadcast the new content.
 
+### Analyzing performance of snooping protocols
+For the comparison of the above mentioned protocols, we read another paper which used a simulation based approach for benchmarking the protocols. We briefly explain the method used and the important insights gained.
+
+**Simulation Model** - The basic model consists of a Simula process for each processor, a process for each cache, and a single process for the system bus. Each processor, after performing useful work for some w cycles (picked from some distribution),
+generates a memory request, puts that request into the service queue of its cache, and waits for a response, during which time no work is done. Processor utilization is measured by the ratio of time spent doing useful work to the total run time. System performance is measured by the total sum of processor utilization in the system.
+
+Each cache services memory requests from its processor by determining whether the requested block is present or absent, or, more precisely, whether the request can be serviced without a bus transaction. If so, after one cycle the cache sends the processor a command to continue. If a bus transaction is required, a bus request is generated and inserted into the service queue of the bus. The cache sends the processor a command to continue only upon completion of the bus transaction.
+
+The cache can also receive commands from the bus process relating to actions that must be performed on blocks of which it has copies. Such commands have higher priority for service by the cache than processor memory requests. In a multiprocessor, this is equivalent to matching a block address on a bus transaction and halting the service of processor requests to take action as specified by tbe protocol. After that action is completed, the cache is free to respond to processor requests. 
+
+**System & Simulation Parameters** - Number of cycles to fetch an item from main memory was taken to be four times of cycles to fetch from cache. The block size is four words, where a single word is the smallest unit of data transferred. The number of processors are varied from 1 to 15. The cache size is varied from 2K to 16K words. Invalidation signals require one cycle of bus time. The probability of memory reference to shared block ranges from 0.1% to 5%. The hit ratio on private block is varied from 95% to 98%. There are other statistics like the probability of a private block being modified incase of reference, the percent of memory requests which are read, probability of shared block being referenced at two or more caches in small interval etc which are mentioned in the paper but we would not go in the exact details.
+
+**Performance - Private blocks**
+
+<p align=center>
+<img src=Figure_7.png width=60% height=500px>
+</p>
+
+When the vast majority of all references are to the private blocks, the differences between the performance of these protocols is entirely due to private block overhead. For the cache-coherence protocols that we modeled there are only two differences in the handling of private blocks: the actions that must be taken on a write hit on a unmodified block, and the actions that must be taken when a block is replaced in the cache.
+
+In case of write hits on unmodified private blocks - 
+* Theoretically, any overhead is logically unnecessary since private blocks are never in other caches, but only the Dragon, Firefly, and Illinois schemes are able to detect this information dynamically. In these schemes the state can be changed from VALID-EXCLUSIVE to DIRTY without any bus transaction since it is known that the unmodified block is not present elsewhere. 
+* The Berkeley scheme requires a single bus cycle for an invalidation signal. 
+* Writeonce (like write-through) requires a single word write to main memory.
+* The Synapse scheme performs a complete block load, as if a write miss had occurred.
+
+The difference that arises in the replacement of blocks in the cache is that, for
+the write-once scheme, the probability that a block needs to be written back is
+reduced. In this scheme those blocks written exactly once are up-to-date in
+memory and therefore do not require a write-back. 
+
+**Performance - Shared blocks** 
+
+<p align=center>
+<img src=Figure_14.png width=60% height=500px>
+</p>
+
+* The results demonstrate that the distributed write approach of Dragon and Firefly yields the best performance in the handling of shared data. For those simulations with a small number of shared blocks (and hence more contention for those blocks) these two protocols significantly outperform the others. This is because the overhead of distributing the newly written data is much lower than repeatedly invalidating all other copies. 
+* The performance of the Dragon exceeds that of the Firefly at levels of high sharing because the Firefly must send distributed writes to memory while the Dragon sends them to the caches only. However, this gain in performance comes at the cost of one added state (SHARED-DIRTY) for the Dragon. 
+* The Berkeley scheme, although somewhat less efficient in handling private blocks, actually surpasses the Illinois scheme at levels of high sharing as a result of its improved efficiency in the handling of shared blocks. On a miss on a block modified in another cache, Berkeley does not require updating main memory as does Illinois. 
+* The performance of write-once is lower than the above schemes (for high levels of contention) as a result of the added overhead of updating memory each time a DIRTY block is missed in another cache. 
+* The performance of Synapse is considerably lower owing to the increased overhead of read misses on blocks that are DIRTY in another cache (the originating cache must resubmit the read miss request) and to the added overhead of loading new data on a write hit on an unmodified block, as was also the case with private blocks.
+
 
 ## Directory Based Protocols
 Just as with a snooping protocol, there are two primary operations that a directory protocol must implement: handling a read miss and handling a write to a shared, clean cache block. (Handling a write miss to a block that is currently shared is a simple combination of these two.) To implement these operations, a directory must track the state of each cache block. In a simple protocol, these states could be the following : 
@@ -174,47 +217,12 @@ These event counts can be used to make several useful observations about the cac
 3. Dragon consistency mechanism differs from others because it is an update protocol rather than an invalidation protocol. Its values indicate that roughly one-sixth of all writes require a bus broadcast in case of Dragon, because it needs to perform a write update.
 
 
-### Analyzing performance of snooping protocols
-For the comparison of the above mentioned protocols, we read another paper which used a simulation based approach for benchmarking the protocols. We briefly explain the method used and the important insights gained.
-
-**Simulation Model** - The basic model consists of a Simula process for each processor, a process for each cache, and a single process for the system bus. Each processor, after performing useful work for some w cycles (picked from some distribution),
-generates a memory request, puts that request into the service queue of its cache, and waits for a response, during which time no work is done. Processor utilization is measured by the ratio of time spent doing useful work to the total run time. System performance is measured by the total sum of processor utilization in the system.
-
-Each cache services memory requests from its processor by determining whether the requested block is present or absent, or, more precisely, whether the request can be serviced without a bus transaction. If so, after one cycle the cache sends the processor a command to continue. If a bus transaction is required, a bus request is generated and inserted into the service queue of the bus. The cache sends the processor a command to continue only upon completion of the bus transaction.
-
-The cache can also receive commands from the bus process relating to actions that must be performed on blocks of which it has copies. Such commands have higher priority for service by the cache than processor memory requests. In a multiprocessor, this is equivalent to matching a block address on a bus transaction and halting the service of processor requests to take action as specified by tbe protocol. After that action is completed, the cache is free to respond to processor requests. 
-
-**System & Simulation Parameters** - Number of cycles to fetch an item from main memory was taken to be four times of cycles to fetch from cache. The block size is four words, where a single word is the smallest unit of data transferred. The number of processors are varied from 1 to 15. The cache size is varied from 2K to 16K words. Invalidation signals require one cycle of bus time. The probability of memory reference to shared block ranges from 0.1% to 5%. The hit ratio on private block is varied from 95% to 98%. There are other statistics like the probability of a private block being modified incase of reference, the percent of memory requests which are read, probability of shared block being referenced at two or more caches in small interval etc which are mentioned in the paper but we would not go in the exact details.
-
-**Performance - Private blocks**
-
-<p align=center>
-<img src=Figure_7.png width=60% height=500px>
-</p>
-
-When the vast majority of all references are to the private blocks, the differences between the performance of these protocols is entirely due to private block overhead. For the cache-coherence protocols that we modeled there are only two differences in the handling of private blocks: the actions that must be taken on a write hit on a unmodified block, and the actions that must be taken when a block is replaced in the cache.
-
-In case of write hits on unmodified private blocks - 
-* Theoretically, any overhead is logically unnecessary since private blocks are never in other caches, but only the Dragon, Firefly, and Illinois schemes are able to detect this information dynamically. In these schemes the state can be changed from VALID-EXCLUSIVE to DIRTY without any bus transaction since it is known that the unmodified block is not present elsewhere. 
-* The Berkeley scheme requires a single bus cycle for an invalidation signal. 
-* Writeonce (like write-through) requires a single word write to main memory.
-* The Synapse scheme performs a complete block load, as if a write miss had occurred.
-
-The difference that arises in the replacement of blocks in the cache is that, for
-the write-once scheme, the probability that a block needs to be written back is
-reduced. In this scheme those blocks written exactly once are up-to-date in
-memory and therefore do not require a write-back. 
-
-**Performance - Shared blocks** 
-
-<p align=center>
-<img src=Figure_14.png width=60% height=500px>
-</p>
-
-* The results demonstrate that the distributed write approach of Dragon and Firefly yields the best performance in the handling of shared data. For those simulations with a small number of shared blocks (and hence more contention for those blocks) these two protocols significantly outperform the others. This is because the overhead of distributing the newly written data is much lower than repeatedly invalidating all other copies. 
-* The performance of the Dragon exceeds that of the Firefly at levels of high sharing because the Firefly must send distributed writes to memory while the Dragon sends them to the caches only. However, this gain in performance comes at the cost of one added state (SHARED-DIRTY) for the Dragon. 
-* The Berkeley scheme, although somewhat less efficient in handling private blocks, actually surpasses the Illinois scheme at levels of high sharing as a result of its improved efficiency in the handling of shared blocks. On a miss on a block modified in another cache, Berkeley does not require updating main memory as does Illinois. 
-* The performance of write-once is lower than the above schemes (for high levels of contention) as a result of the added overhead of updating memory each time a DIRTY block is missed in another cache. 
-* The performance of Synapse is considerably lower owing to the increased overhead of read misses on blocks that are DIRTY in another cache (the originating cache must resubmit the read miss request) and to the added overhead of loading new data on a write hit on an unmodified block, as was also the case with private blocks. 
+ 
 ## Hybrid Protocols
 ## Conclusion
+## References
+[1] John L. Hennessy, and  David A. Patterson.  Computer Architecture A Quantitative Approach Fourth Edition.
+
+[2] Eggers. S. J., and Katz, R. H. (1989). Evaluating the Performance of Four Snooping cache Coherence Protocols. In: Proc. 16th Annual Int'l Symposium on Computer Architecture.
+
+[3] Owicki, S., and Agarwal, A. (1989). Evaluating the Performance of Software Cache Coherence. In: Proc. 3rd Inr '1 Conference on Architectural Support for Programming Languages and Operating Systems.
