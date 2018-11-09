@@ -118,5 +118,9 @@ Each cache services memory requests from its processor by determining whether th
 
 The cache can also receive commands from the bus process relating to actions that must be performed on blocks of which it has copies. Such commands have higher priority for service by the cache than processor memory requests. In a multiprocessor, this is equivalent to matching a block address on a bus transaction and halting the service of processor requests to take action as specified by tbe protocol. After that action is completed, the cache is free to respond to processor requests. 
 
+**System & Simulation Parameters** - Number of cycles to fetch an item from main memory was taken to be four times of cycles to fetch from cache. The block size is four words, where a single word is the smallest unit of data transferred. The number of processors are varied from 1 to 15. The cache size is varied from 2K to 16K words. Invalidation signals require one cycle of bus time. The probability of memory reference to shared block ranges from 0.1% to 5%. The hit ratio on private block is varied from 95% to 98%. There are other statistics like the probability of a private block being modified incase of reference, the percent of memory requests which are read, probability of shared block being referenced at two or more caches in small interval etc which are mentioned in the paper but we would not go in the exact details.
+
+
+
 ## Hybrid Protocols
 ## Conclusion
