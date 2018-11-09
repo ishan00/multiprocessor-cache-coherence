@@ -152,45 +152,45 @@ Scalability is one of the strongest motivations for going to directory based des
 Hence we can say that Snoopy schemes are used on small scale multiprocessors which can live with the bandwidth constraints of the shared bus while Directory based schemes are better suited for building large scale, cache coherent multiprocessors where single bus is unsuitable as a communication mechanism.
 
 Several directory-based consistency schemes have been proposed in literature. We will now briefly discuss some of the basic schemes - 
-### Tang
+### 1. Tang
 This scheme allows clean blocks to exist in many caches, but disallows dirty blocks from residing in more than one cache (most snoopy cache coherence schemes use the same policy). In  this scheme, each cache maintains a dirty bit for each of its blocks, and the central directory kept at memory contains a copy of all the tags and dirty bits in each cache. On a read miss, the central directory is checked to see if the block is dirty in another cache. If so, consistency is maintained by copying the dirty block back to memory before supplying the data: if the directory indicates the data is not dirty in another cache, then it supplies the data from memory. The directory is then updated to indicate that the requesting cache now has a clean copy of the data. The central directory is also checked on a write miss. In this case, if the block is dirty in another cache then the block is first flushed from that cache back to memory before supplying the data: if the block is clean in other caches then it is invalidated in those caches(i.e., removed from the caches). The data is then supplied to the requesting cache and the directory modified to show that the cache has a dirty copy of the block. On a write hit, the cache's dirty bit is checked. If the block is already dirty, there is no need to check the central directory, so the write can proceed immediately. If the block is clean, then the cache notifies the central directory, which must invalidate the block in all of the other caches where it resides.
-### Censier and Feautrier
+### 2. Censier and Feautrier
 This scheme also proposed a similar consistency mechanism that performs the same actions as the Tang scheme but organizes the central directory differently. Tang duplicates each of the individual cache directories as his main directory. To find out which caches contain a block, Tang's scheme must search each of these duplicate directories. In the Censier and Feautrier central directory, a dirty bit and a number of valid (or "present") bits equal to the number of caches are associated with each block in main memory. This organization provides the same information as the duplicate cache directory method but allows this information to be accessed directly using the address supplied to the central directory by the requesting cache. Each valid bit is set if the corresponding cache contains a valid copy of the block. Since a dirty block can only exist in at most one cache, no more than one of a block's valid bits may be set if the dirty bit is set.
-### Yen and Fu
+### 3. Yen and Fu
 This scheme suggested a small refinement to Censier and Feautrier consistency technique. The central directory is unchanged, but in addition to the valid and dirty bits, a flag called the single bit is associated with each block in the caches. A cache block's single bit is se if and only if that cache is the only one in the system that contains the block. This saves having to complete a directory access before writing to a clean block that is not cached elsewhere. The major drawback of this scheme is that extra bus bandwidth is consumed to keep the single bits updated in all the caches. Thus, the scheme saves central directory accesses, but does not reduce the number of bus accesses versus the Censier and Feautrier protocol.
-### Archibald and Baer
+### 4. Archibald and Baer
 This scheme presented a directory-based consistency mechanism with a different organization for the central directory that reduces the amount of storage space in the directory, and also makes it easier to add more caches to the system. The directory saves only two bits with each block in main memory. These bits encode on of four possible stated: block not cached, block clean in exactly on cache, block clean in an unknown number of caches, and block  dirty in exactly on cache. The directory therefore contains no information to indicate which caches contain a block: the scheme relies on broadcasts to perform in invalidates and writeback requests. The block clean in exactly on cache state obviates the need for a broadcast when writing to a clean block that is not contained in any other caches.
 
-Two clear differences are present among these directory schemes : the number of processor indices contained in the directories and the presence of a broadcast bit. We can thus classify the schemes as DiriX, where i is the number of indices kept in the directory and X is either B or NB for Broadcast or No Broadcast. In a no-broadcast scheme the number of processors that have copies of a datum must always be less than or equal to i, the number of indices kept in the directory. If the scheme allows broadcast then the numbers of processors can be larger and when it is (indicated by a bit in the directory) a broadcast is used to invalidate the cached data. The one case that does not make sense is Dir0NB, since there is no way to obtain exclusive access.
+Two clear differences are present among these directory schemes : the number of processor indices contained in the directories and the presence of a broadcast bit. We can thus classify the schemes as Dir<sub>i</sub>X, where i is the number of indices kept in the directory and X is either B or NB for Broadcast or No Broadcast. In a no-broadcast scheme the number of processors that have copies of a datum must always be less than or equal to i, the number of indices kept in the directory. If the scheme allows broadcast then the numbers of processors can be larger and when it is (indicated by a bit in the directory) a broadcast is used to invalidate the cached data. The one case that does not make sense is Dir<sub>0</sub>NB, since there is no way to obtain exclusive access.
 
-In this terminology, the Tang scheme is classified as DirnNB, the Censier and Feautrier scheme is DirnNB also, and the Bear and Archibald scheme is Dir0B.  Our evaluation concentrates on a couple of key points in the design space: Dir1NB and Dir0B. 
+In this terminology, the Tang scheme is classified as Dir<sub>n</sub>NB, the Censier and Feautrier scheme is Dir<sub>n</sub>NB also, and the Bear and Archibald scheme is Dir<sub>0</sub>B.  Our evaluation concentrates on a couple of key points in the design space: Dir<sub>1</sub>NB and Dir<sub>0</sub>B. 
 
 ### Analyzing performance of directory based protocols
-We read a paper which evaluated two directory based schemes(called Dir1NB and Dir0B) and two snoopy cache schemes(Write-Through-Invalidate and Dragon) for comparison purposes. WTI is considered to be one of the lowest performing, while Dragon is considered to be one of the best performing snoopy cache schemes. 
+We read a paper which evaluated two directory based schemes(called Dir<sub>1</sub>NB and Dir<sub>0</sub>B) and two snoopy cache schemes(Write-Through-Invalidate and Dragon) for comparison purposes. WTI is considered to be one of the lowest performing, while Dragon is considered to be one of the best performing snoopy cache schemes. 
 
 Simulation using multiprocessor address traces is used as the method of evaluation. The three traces used for simulation are obtained using a multiprocessor with four processors. A trace shows some amount of sharing between processors that is induced solely by process migration. The temporal ordering of various synchronization activities is retained in the trace.
 
 The paper intends to isolate and measure only the traffic incurred in maintaining a coherent shared memory system in a multiprocessor. To this end, simulations use infinite caches to eliminate the traffic caused by interference in finite caches. For evaluating the four consistency schemes, the frequency of each type of references has been measured. Following table gives a breakdown of the various types of references that take place in the four schemes and their relative frequencies across the three traces.
 
-| Event Type | Dir1NB | WTI | Dir0B | Dragon |
-|:-----:|:-----:|:--------:|:------:|:------:|
+| Event Type | Dir<sub>1</sub>NB | WTI | Dir<sub>0</sub>B | Dragon |
+|:-----|:-----:|:--------:|:------:|:------:|
 | instr | 49.72 | 49.72 | 49.72 | 49.72 |
 | read | 39.82 | 39.82 | 39.82 | 39.82 |
-| rd-hit | 34.32 | 38.88 | 38.88 | 39.20 |
-| rd-miss(rm) | 5.18 | 0.62 | 0.62 | 0.30 |
-| rm-blk-cln | 4.78 | - | 0.23 | 0.14 |
-| rm-blk-drty | 0.40 | - | 0.40 | 0.17 |
-| rm-first-ref| 0.32 | 0.32 | 0.32 | 0.32 |
+| &nbsp; rd-hit | 34.32 | 38.88 | 38.88 | 39.20 |
+| &nbsp; rd-miss(rm) | 5.18 | 0.62 | 0.62 | 0.30 |
+| &nbsp; &nbsp; rm-blk-cln | 4.78 | - | 0.23 | 0.14 |
+| &nbsp; &nbsp; rm-blk-drty | 0.40 | - | 0.40 | 0.17 |
+| &nbsp; rm-first-ref| 0.32 | 0.32 | 0.32 | 0.32 |
 | write | 10.46 | 10.46 | 10.46 | 10.46 |
-| wrt-hit(wh) | 10.19 | 10.25 | 10.25 | 10.36 |
-| wh-blk-cln | - | - | 0.41 | - |
-| wh-blk-drty | - | - | 9.48 | - |
-| wh-distrib | - | - | - | 1.74 |
-| wh-local | - | - | - | 8.62 |
-| wrt-miss(wm) | 0.17 | 0.12 | 0.11 | 0.02 |
-| wm-blk-cln | 0.08 | - | 0.02 | 0.01 |
-| wm-blk-drty | 0.09 | - | 0.09 | 0.01 |
-| wm-first-ref | 0.08 | 0.08 | 0.08 | 0.08 |
+| &nbsp; wrt-hit(wh) | 10.19 | 10.25 | 10.25 | 10.36 |
+| &nbsp; &nbsp; wh-blk-cln | - | - | 0.41 | - |
+| &nbsp; &nbsp; wh-blk-drty | - | - | 9.48 | - |
+| &nbsp; &nbsp; wh-distrib | - | - | - | 1.74 |
+| &nbsp; &nbsp; wh-local | - | - | - | 8.62 |
+| &nbsp; wrt-miss(wm) | 0.17 | 0.12 | 0.11 | 0.02 |
+| &nbsp; &nbsp; wm-blk-cln | 0.08 | - | 0.02 | 0.01 |
+| &nbsp; &nbsp; wm-blk-drty | 0.09 | - | 0.09 | 0.01 |
+| &nbsp; wm-first-ref | 0.08 | 0.08 | 0.08 | 0.08 |
 
 Instr					Instructions
 Read					Reads
@@ -212,8 +212,8 @@ Wm-first-ref			Write miss, first reference to the block
 
 These event counts can be used to make several useful observations about the cache behaviour as well as data sharing behaviour of the the trace.
 
-1. Dir1NB consistency scheme has high rate of data read misses (5.18% of all references), indicating a high penalty for allowing a block to reside in no more than one cache at a time.
-2. Reference rates for WTI method match those of Dir0B. A cache coherence protocol can be thought of to be made of two parts : a specification of state changes and the protocol to implement it. The event frequencies depend only on the state change specification, not the method used to implement it. Since WTI and Dir0B rely on the same basic state change model of allowing multiple cached copies of clean blocks but only a single copy of dirty blocks, their event frequencies are identical.
+1. Dir<sub>1</sub>NB consistency scheme has high rate of data read misses (5.18% of all references), indicating a high penalty for allowing a block to reside in no more than one cache at a time.
+2. Reference rates for WTI method match those of Dir<sub>0</sub>B. A cache coherence protocol can be thought of to be made of two parts : a specification of state changes and the protocol to implement it. The event frequencies depend only on the state change specification, not the method used to implement it. Since WTI and Dir<sub>0</sub>B rely on the same basic state change model of allowing multiple cached copies of clean blocks but only a single copy of dirty blocks, their event frequencies are identical.
 3. Dragon consistency mechanism differs from others because it is an update protocol rather than an invalidation protocol. Its values indicate that roughly one-sixth of all writes require a bus broadcast in case of Dragon, because it needs to perform a write update.
 
 
